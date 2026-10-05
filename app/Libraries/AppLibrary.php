@@ -18,7 +18,27 @@ use Dipokhalder\Settings\Facades\Settings;
 
 class AppLibrary
 {
-    public static function date($date, $pattern = null): string
+    public static function appVersion()
+    {
+        return config('product.version');
+    }
+
+    public static function isBetweenDate(?string $startDate, ?string $endDate): bool
+    {
+        if (empty($startDate) || empty($endDate)) {
+            return false;
+        }
+        try {
+            $now   = Carbon::now();
+            $start = Carbon::parse($startDate);
+            $end   = Carbon::parse($endDate);
+            return $now->between($start, $end);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public static function date($date, $pattern = null): string 
     {
         if (!$pattern) {
             $pattern = env('DATE_FORMAT');
