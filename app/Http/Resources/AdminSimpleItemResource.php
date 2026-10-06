@@ -31,14 +31,14 @@ class AdminSimpleItemResource extends JsonResource
             "preview"          => $this->preview,
             "category_name"    => optional($this->category)->getRawOriginal('name'),
             "offer"            => SimpleOfferResource::collection(
-                $this->offer->filter(function ($offer) use ($price) {
+                $this->offer ? $this->offer->filter(function ($offer) use ($price) {
                     if (AppLibrary::isBetweenDate($offer->start_date, $offer->end_date) && $offer->status === Status::ACTIVE) {
                         $offer->flat_price     = AppLibrary::flatAmountFormat($price - ($price / 100 * $offer->amount));
                         $offer->convert_price  = AppLibrary::convertAmountFormat($price - ($price / 100 * $offer->amount));
                         $offer->currency_price = AppLibrary::currencyAmountFormat($price - ($price / 100 * $offer->amount));
                         return $offer;
                     }
-                })
+                }) : collect()
             )
         ];
     }

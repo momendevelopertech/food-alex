@@ -42,13 +42,13 @@ class ItemResource extends JsonResource
             "category_name"    => optional($this->category)->getRawOriginal('name'),
             "category"         => new AdminItemCategoryResource($this->category),
             "tax"              => new TaxResource($this->tax),
-            "variations"       => $this->variations->groupBy('item_attribute_id'),
+            "variations"       => $this->variations ? $this->variations->groupBy('item_attribute_id') : collect(),
             "itemAttributes"   => ItemAttributeResource::collection($this->itemAttributeList($this->variations)),
-            "extras"           => ItemExtraResource::collection($this->extras),
-            "addons"           => ItemAddonResource::collection($this->addons->load('addonItem')),
+            "extras"           => ItemExtraResource::collection($this->extras ? $this->extras->load('item') : collect()),
+            "addons"           => ItemAddonResource::collection($this->addons ? $this->addons->load('addonItem') : collect()),
             "translations"     => $this->whenLoaded('translations', $this->translations),
             "offer"            => SimpleOfferResource::collection(
-                $this->offer->filter(function ($offer) use ($price) {
+                $this->offer ? $this->offer->filter(function ($offer) use ($price) {
                     if (AppLibrary::isBetweenDate($offer->start_date, $offer->end_date) && $offer->status === Status::ACTIVE) {
                         $amount                = ($price - ($price / 100 * $offer->amount));
                         $offer->flat_price     = AppLibrary::flatAmountFormat($amount);
@@ -56,7 +56,7 @@ class ItemResource extends JsonResource
                         $offer->currency_price = AppLibrary::currencyAmountFormat($amount);
                         return $offer;
                     }
-                })
+                }) : collect()
             )
         ];
     }
@@ -64,13 +64,15 @@ class ItemResource extends JsonResource
     private function itemAttributeList($variations)
     {
         $array = [];
-        foreach ($variations as $b) {
-            if (!isset($array[$b->itemAttribute->id])) {
-                $array[$b->itemAttribute->id] = (object)[
-                    'id'     => $b->itemAttribute->id,
-                    'name'   => $b->itemAttribute->name,
-                    'status' => $b->itemAttribute->status
-                ];
+        if ($variations) {
+            foreach ($variations as $b) {
+                if ($b->itemAttribute && !isset($array[$b->itemAttribute->id])) {
+                    $array[$b->itemAttribute->id] = (object)[
+                        'id'     => $b->itemAttribute->id,
+                        'name'   => $b->itemAttribute->name,
+                        'status' => $b->itemAttribute->status
+                    ];
+                }
             }
         }
         return collect($array);

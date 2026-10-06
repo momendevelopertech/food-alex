@@ -39,7 +39,7 @@ class SimpleItemResource extends JsonResource
             "preview"        => $this->preview,
             "category_name"  => optional($this->category)->name,
             "offer"          => SimpleOfferResource::collection(
-                $this->offer->filter(function ($offer) use ($price) {
+                $this->offer ? $this->offer->filter(function ($offer) use ($price) {
                     if (AppLibrary::isBetweenDate(
                             $offer->start_date,
                             $offer->end_date
@@ -53,7 +53,7 @@ class SimpleItemResource extends JsonResource
                         );
                         return $offer;
                     }
-                })
+                }) : collect()
             )
         ];
     }

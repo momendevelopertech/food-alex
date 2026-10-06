@@ -24,8 +24,8 @@ class ItemAddonResource extends JsonResource
     public function toArray($request)
     {
         $this->variation = $this->variationTotal();
-        $price           = $this?->addonItem?->price;
-        $offer           = $this->addonItem?->offer?->filter(function ($offer) use ($price) {
+        $price           = optional($this->addonItem)->price ?? 0;
+        $offer           = $this->addonItem?->offer ? $this->addonItem->offer->filter(function ($offer) use ($price) {
             if (AppLibrary::isBetweenDate(
                 $offer->start_date,
                 $offer->end_date
@@ -36,46 +36,47 @@ class ItemAddonResource extends JsonResource
                 $offer->currency_price = AppLibrary::currencyAmountFormat($amount);
                 return $offer;
             }
-        });
+        }) : collect();
+        if (!$offer) {
+            $offer = collect();
+        }
         $firstOffer      = ($offer && $offer->isNotEmpty()) ? $offer->first() : null;
-        $addonPrice      = $this->addonItem?->price ?? 0;
-        $total           = ($this->variation?->price ?? 0) + ($firstOffer ? $firstOffer->convert_price : $addonPrice);
+        $addonPrice      = optional($this->addonItem)->price ?? 0;
+        $total           = (optional($this->variation)->price ?? 0) + ($firstOffer ? $firstOffer->convert_price : $addonPrice);
         return [
             'id'                             => $this->id,
             'item_id'                        => $this->item_id,
             'item_addon_id'                  => $this->addon_item_id,
             'item_name'                      => optional($this->item)->name,
             'addon_item_name'                => optional($this->addonItem)->name,
-            'addon_item_price'               => optional($this->addonItem)->price,
-            "addon_item_flat_price"          => AppLibrary::flatAmountFormat(optional($this->addonItem)->price),
-            "addon_item_convert_price"       => AppLibrary::convertAmountFormat(optional($this->addonItem)->price),
-            "addon_item_currency_price"      => AppLibrary::currencyAmountFormat(optional($this->addonItem)->price),
+            'addon_item_price'               => optional($this->addonItem)->price ?? 0,
+            "addon_item_flat_price"          => AppLibrary::flatAmountFormat(optional($this->addonItem)->price ?? 0),
+            "addon_item_convert_price"       => AppLibrary::convertAmountFormat(optional($this->addonItem)->price ?? 0),
+            "addon_item_currency_price"      => AppLibrary::currencyAmountFormat(optional($this->addonItem)->price ?? 0),
             'addon_item_status'              => optional($this->addonItem)->status,
-            'variations'                     => json_decode($this->addon_item_variation),
-            'variation_total'                => optional($this->variation)->price,
-            "variation_total_flat_price"     => AppLibrary::flatAmountFormat(optional($this->variation)->price),
-            "variation_total_convert_price"  => AppLibrary::convertAmountFormat(optional($this->variation)->price),
-            "variation_total_currency_price" => AppLibrary::currencyAmountFormat(optional($this->variation)->price),
+            'variations'                     => json_decode($this->addon_item_variation ?? '[]'),
+            'variation_total'                => optional($this->variation)->price ?? 0,
+            "variation_total_flat_price"     => AppLibrary::flatAmountFormat(optional($this->variation)->price ?? 0),
+            "variation_total_convert_price"  => AppLibrary::convertAmountFormat(optional($this->variation)->price ?? 0),
+            "variation_total_currency_price" => AppLibrary::currencyAmountFormat(optional($this->variation)->price ?? 0),
             'total'                          => $total,
             "total_flat_price"               => AppLibrary::flatAmountFormat($total),
             "total_convert_price"            => AppLibrary::convertAmountFormat($total),
             "total_currency_price"           => AppLibrary::currencyAmountFormat($total),
-            'variation_names'                => $this->variation?->name,
-            "thumb"                          => $this->addonItem?->thumb,
-            "cover"                          => $this->addonItem?->cover,
-            "preview"                        => $this->addonItem?->preview,
-            "caution"                        => optional($this->addonItem?->caution) == null ? '' : optional(
-                $this->addonItem
-            )->caution,
-            "offer"                          => SimpleOfferResource::collection($offer)
+            'variation_names'                => optional($this->variation)->name ?? [],
+            'thumb'                          => optional($this->addonItem)->thumb,
+            'cover'                          => optional($this->addonItem)->cover,
+            'preview'                        => optional($this->addonItem)->preview,
+            'caution'                        => optional($this->addonItem)->caution ?? '',
+            'offer'                          => SimpleOfferResource::collection($offer)
         ];
     }
 
     private function variationTotal()
     {
-        $variationArray = $this->addonItem?->variations?->mapWithKeys(function ($variation) {
+        $variationArray = $this->addonItem?->variations ? $this->addonItem->variations->mapWithKeys(function ($variation) {
             return [$variation->id => $variation];
-        });
+        }) : collect();
         if ($this->addon_item_variation) {
             $variations = (object) json_decode($this->addon_item_variation, true);
             $price      = 0;
@@ -95,5 +96,9 @@ class ItemAddonResource extends JsonResource
                 'name'  => $name
             ];
         }
+        return (object)[
+            'price' => 0,
+            'name'  => []
+        ];
     }
 }
