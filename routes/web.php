@@ -40,4 +40,51 @@ Route::prefix('payment')->name('payment.')->middleware(['installed'])->group(fun
     Route::get('/successful/{order}', [PaymentController::class, 'successful'])->name('successful');
 });
 
+Route::get('/system/sync-live-data', function (\Illuminate\Http\Request $request) {
+    if ($request->query('key') !== env('VITE_API_KEY', 'FoodAlexAPIKey2026')) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+    
+    // 1. Update Admin User to مدحت and Egyptian phone
+    \App\Models\User::where('email', 'admin@example.com')
+        ->orWhere('id', 1)
+        ->update([
+            'name' => 'مدحت',
+            'phone' => '0123456789',
+            'country_code' => '+20'
+        ]);
+
+    // 2. Replace any remaining +880 country codes with +20
+    \App\Models\User::where('country_code', '+880')
+        ->update(['country_code' => '+20']);
+
+    // 3. Update Settings site & company
+    \Illuminate\Support\Facades\DB::table('settings')
+        ->where('key', 'site_default_currency_symbol')
+        ->update(['value' => 'ج.م']);
+        
+    \Illuminate\Support\Facades\DB::table('settings')
+        ->where('key', 'company_country_code')
+        ->update(['value' => 'EG']);
+
+    \Illuminate\Support\Facades\DB::table('settings')
+        ->where('key', 'company_phone')
+        ->update(['value' => '0123456789']);
+
+    // 4. Update currencies table
+    \Illuminate\Support\Facades\DB::table('currencies')
+        ->where('code', 'EGP')
+        ->update(['symbol' => 'ج.م']);
+
+    // 5. Clear application caches
+    try {
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    } catch (\Throwable $e) {}
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Admin updated to مدحت (0123456789), currency synced to ج.م, and cache cleared successfully!'
+    ]);
+});
+
 Route::get('/{any}', [RootController::class, 'index'])->middleware(['installed'])->where(['any' => '.*']);

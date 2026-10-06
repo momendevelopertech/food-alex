@@ -69,10 +69,15 @@ export default {
     },
 
     currencyFormat(amount, decimal, currency, position) {
+        if (!currency || typeof currency !== 'string' || currency.includes('?')) {
+            currency = 'ج.م';
+        }
+        const val = isNaN(parseFloat(amount)) ? 0 : parseFloat(amount);
+        const dec = isNaN(parseInt(decimal)) ? 2 : parseInt(decimal);
         if (position === currencyPositionEnum.LEFT) {
-            return currency + parseFloat(amount).toFixed(decimal);
+            return currency.trim() + ' ' + val.toFixed(dec);
         } else {
-            return parseFloat(amount).toFixed(decimal) + currency;
+            return val.toFixed(dec) + ' ' + currency.trim();
         }
     },
     logoutConfirmation: function () {

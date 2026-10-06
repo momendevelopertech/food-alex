@@ -84,8 +84,7 @@
                                 <span class="db-list-item-title w-full sm:w-1/2">{{
                                     $t("label.phone")
                                 }}</span>
-                                <span class="db-list-item-text w-full sm:w-1/2">{{ administrator.phone ?
-                                    administrator.country_code + '' + administrator.phone : '' }}</span>
+                                <span class="db-list-item-text w-full sm:w-1/2" dir="ltr" style="unicode-bidi: isolate; text-align: start;">{{ phoneNumberFormat(administrator.country_code, administrator.phone) }}</span>
                             </div>
                         </div>
                         <div class="col-12 sm:col-6 !py-1.5">
@@ -311,6 +310,13 @@ export default {
         this.orderLists();
     },
     methods: {
+        phoneNumberFormat: function (countryCode, phone) {
+            if (!phone) return '';
+            if (!countryCode || countryCode === '+880') {
+                return phone;
+            }
+            return countryCode + ' ' + phone;
+        },
         textShortener: function (text, number = 30) {
             return appService.textShortener(text, number);
         },

@@ -290,10 +290,15 @@ class AppLibrary
 
     public static function currencyAmountFormat($amount): string
     {
-        if (env('CURRENCY_POSITION') == CurrencyPosition::LEFT) {
-            return env('CURRENCY_SYMBOL') . number_format($amount, env('CURRENCY_DECIMAL_POINT'), '.', '');
+        $symbol = (string)env('CURRENCY_SYMBOL', 'ج.م');
+        if (trim($symbol) === '' || str_contains($symbol, '?')) {
+            $symbol = 'ج.م';
         }
-        return number_format($amount, env('CURRENCY_DECIMAL_POINT'), '.', '') . env('CURRENCY_SYMBOL');
+        $decimal = (int)env('CURRENCY_DECIMAL_POINT', 2);
+        if (env('CURRENCY_POSITION') == CurrencyPosition::LEFT) {
+            return $symbol . ' ' . number_format((float)$amount, $decimal, '.', '');
+        }
+        return number_format((float)$amount, $decimal, '.', '') . ' ' . $symbol;
     }
 
     public static function flatAmountFormat($amount): string

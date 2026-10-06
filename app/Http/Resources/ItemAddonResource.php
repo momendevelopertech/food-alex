@@ -8,8 +8,6 @@ use App\Libraries\AppLibrary;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use function PHPUnit\Framework\isNull;
-
 class ItemAddonResource extends JsonResource
 {
 
@@ -39,10 +37,9 @@ class ItemAddonResource extends JsonResource
                 return $offer;
             }
         });
-        if (isNull($offer)) {
-            $offer = [];
-        }
-        $total           = $this->variation?->price + (count($offer) ? $offer[0]->convert_price : $this->addonItem?->price);
+        $firstOffer      = ($offer && $offer->isNotEmpty()) ? $offer->first() : null;
+        $addonPrice      = $this->addonItem?->price ?? 0;
+        $total           = ($this->variation?->price ?? 0) + ($firstOffer ? $firstOffer->convert_price : $addonPrice);
         return [
             'id'                             => $this->id,
             'item_id'                        => $this->item_id,
@@ -88,7 +85,7 @@ class ItemAddonResource extends JsonResource
                     $name[] = [
                         'id'             => $variationArray[$variation]->id,
                         'name'           => $variationArray[$variation]->name,
-                        'attribute_name' => $variationArray[$variation]->itemAttribute->name
+                        'attribute_name' => optional($variationArray[$variation]->itemAttribute)->name ?? ''
                     ];
                     $price  += $variationArray[$variation]->price;
                 }

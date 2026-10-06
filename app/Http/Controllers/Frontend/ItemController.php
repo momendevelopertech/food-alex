@@ -54,7 +54,8 @@ class ItemController extends Controller
     {
         try {
            return new NormalItemResource($this->itemService->itemDetails($item));
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
+            \Illuminate\Support\Facades\Log::error('itemDetails Frontend error: ' . $exception->getMessage() . ' in ' . $exception->getFile() . ':' . $exception->getLine());
             return response(['status' => false, 'message' => $exception->getMessage()], 422);
         }
     }

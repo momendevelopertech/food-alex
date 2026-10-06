@@ -163,6 +163,7 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import axios from "axios";
 import statusEnum from "../../../enums/modules/statusEnum";
+import displayModeEnum from "../../../enums/modules/displayModeEnum";
 
 export default {
     name: "BackendNavbarComponent",

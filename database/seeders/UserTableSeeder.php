@@ -22,15 +22,15 @@ class UserTableSeeder extends Seeder
     {
         $envService = new EnvEditor();
         $admin      = User::create([
-            'name'              => 'John Doe',
+            'name'              => 'مدحت',
             'email'             => 'admin@example.com',
-            'phone'             => '1254875855',
+            'phone'             => '0123456789',
             'username'          => 'admin',
             'email_verified_at' => now(),
             'password'          => bcrypt('123456'),
             'branch_id'         => 0,
             'status'            => Status::ACTIVE,
-            'country_code'      => '+880',
+            'country_code'      => '+20',
             'is_guest'          => Ask::NO
         ]);
         $admin->assignRole(EnumRole::ADMIN);

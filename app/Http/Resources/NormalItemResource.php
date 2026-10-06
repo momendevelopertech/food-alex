@@ -34,12 +34,12 @@ class NormalItemResource extends JsonResource
             "thumb"          => $this->thumb,
             "cover"          => $this->cover,
             "preview"        => $this->preview,
-            "variations"     => $this->variations->groupBy('item_attribute_id'),
+            "variations"     => $this->variations ? $this->variations->groupBy('item_attribute_id') : collect(),
             "itemAttributes" => ItemAttributeResource::collection($this->itemAttributeList($this->variations)),
-            "extras"         => ItemExtraResource::collection($this->extras->load('item')),
-            "addons"         => ItemAddonResource::collection($this->addons->load('addonItem', 'addonItem.variations','addonItem.offer', 'item')),
+            "extras"         => ItemExtraResource::collection($this->extras ? $this->extras->load('item') : collect()),
+            "addons"         => ItemAddonResource::collection($this->addons ? $this->addons->load('addonItem', 'addonItem.variations','addonItem.offer', 'item') : collect()),
             "offer"          => SimpleOfferResource::collection(
-                $this->offer->filter(function ($offer) use ($price) {
+                $this->offer ? $this->offer->filter(function ($offer) use ($price) {
                     if (AppLibrary::isBetweenDate(
                             $offer->start_date,
                             $offer->end_date
@@ -53,21 +53,23 @@ class NormalItemResource extends JsonResource
                         );
                         return $offer;
                     }
-                })
+                }) : collect()
             )
         ];
     }
 
-    private function itemAttributeList($variations
-    ) : \Vanilla\Support\Collection | \IlluminateAgnostic\Str\Support\Collection | \IlluminateAgnostic\StrAgnostic\Str\Support\Collection | \IlluminateAgnostic\Collection\Support\Collection | \IlluminateAgnostic\ArrAgnostic\Arr\Support\Collection | \Illuminate\Support\Collection | \IlluminateAgnostic\Arr\Support\Collection {
+    private function itemAttributeList($variations)
+    {
         $array = [];
-        foreach ($variations as $b) {
-            if (!isset($array[$b->itemAttribute->id])) {
-                $array[$b->itemAttribute->id] = (object)[
-                    'id'     => $b->itemAttribute->id,
-                    'name'   => $b->itemAttribute->name,
-                    'status' => $b->itemAttribute->status
-                ];
+        if ($variations) {
+            foreach ($variations as $b) {
+                if ($b->itemAttribute && !isset($array[$b->itemAttribute->id])) {
+                    $array[$b->itemAttribute->id] = (object)[
+                        'id'     => $b->itemAttribute->id,
+                        'name'   => $b->itemAttribute->name,
+                        'status' => $b->itemAttribute->status
+                    ];
+                }
             }
         }
         return collect($array);

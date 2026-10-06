@@ -105,7 +105,9 @@
                                 {{ administrator.email }}
                             </td>
                             <td class="db-table-body-td">
-                                {{ administrator.phone ? administrator.country_code + '' + administrator.phone : '' }}
+                                <span dir="ltr" style="unicode-bidi: isolate; display: inline-block;">
+                                    {{ phoneNumberFormat(administrator.country_code, administrator.phone) }}
+                                </span>
                             </td>
                             <td class="db-table-body-td ">
                                 <span :class="statusClass(administrator.status)">
@@ -282,6 +284,13 @@ export default {
         }
     },
     methods: {
+        phoneNumberFormat: function (countryCode, phone) {
+            if (!phone) return '';
+            if (!countryCode || countryCode === '+880') {
+                return phone;
+            }
+            return countryCode + ' ' + phone;
+        },
         permissionChecker(e) {
             return appService.permissionChecker(e);
         },

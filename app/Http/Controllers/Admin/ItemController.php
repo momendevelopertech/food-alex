@@ -136,7 +136,8 @@ class ItemController extends AdminController implements HasMiddleware
     {
         try {
            return new AdminNormalItemResource($this->itemService->itemDetails($item));
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
+            \Illuminate\Support\Facades\Log::error('itemDetails Admin error: ' . $exception->getMessage() . ' in ' . $exception->getFile() . ':' . $exception->getLine());
             return response(['status' => false, 'message' => $exception->getMessage()], 422);
         }
     }

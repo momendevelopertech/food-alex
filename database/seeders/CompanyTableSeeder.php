@@ -18,15 +18,15 @@ class CompanyTableSeeder extends Seeder
     public function run()
     {
         Settings::group('company')->set([
-            'company_name'         => 'FoodKing - Restaurant Food Ordering & Delivery App',
-            'company_email'        => 'info@inilabs.net',
-            'company_phone'        => '+8801309000432',
-            'company_website'      => 'https://foodking.dev',
-            'company_city'         => 'Mirpur 1',
-            'company_state'        => 'Dhaka',
-            'company_country_code' => 'BGD',
-            'company_zip_code'     => '1216',
-            'company_address'      => 'House : 25, Road No: 2, Block A, Mirpur-1, Dhaka 1216'
+            'company_name'         => 'FoodAlex - Restaurant Food Ordering & Delivery App',
+            'company_email'        => 'info@food-alex.kesug.com',
+            'company_phone'        => '0123456789',
+            'company_website'      => 'https://food-alex.kesug.com',
+            'company_city'         => 'Alexandria',
+            'company_state'        => 'Alexandria',
+            'company_country_code' => 'EG',
+            'company_zip_code'     => '21500',
+            'company_address'      => 'Alexandria, Egypt'
         ]);
 
         $envService = new EnvEditor();
