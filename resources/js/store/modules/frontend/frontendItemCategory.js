@@ -23,7 +23,7 @@ export const frontendItemCategory = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (!payload || typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (!payload || typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("lists", res?.data?.data || []);
                     }
                     resolve(res);
@@ -36,7 +36,7 @@ export const frontendItemCategory = {
             if (payload) {
                 return new Promise((resolve, reject) => {
                     axios.get(`frontend/item-category/show/${payload.slug}`).then((res) => {
-                        if (!payload || typeof payload.vuex === "undefined" || payload.vuex === true) {
+                        if (!payload || typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                             context.commit("show", res?.data?.data || {});
                         }
                         resolve(res);

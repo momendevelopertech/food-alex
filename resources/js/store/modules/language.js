@@ -49,8 +49,8 @@ export const language = {
                     .get(url)
                     .then((res) => {
                         if (
-                            typeof payload.vuex === "undefined" ||
-                            payload.vuex === true
+                            typeof payload?.vuex === "undefined" ||
+                            payload?.vuex === true
                         ) {
                             context.commit("lists", res.data.data);
                             context.commit("page", res.data.meta);

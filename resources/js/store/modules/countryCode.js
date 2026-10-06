@@ -4,15 +4,15 @@ export const countryCode = {
     namespaced: true,
     state: {
         lists: [],
-        show: [],
+        show: {},
     },
 
     getters: {
         lists: function (state) {
-            return state.lists;
+            return Array.isArray(state.lists) ? state.lists : [];
         },
         show: function (state) {
-            return state.show;
+            return (state.show && typeof state.show === 'object') ? state.show : {};
         },
     },
 
@@ -22,21 +22,22 @@ export const countryCode = {
                 axios
                     .get("admin/country-code")
                     .then((res) => {
-                        context.commit("lists", res.data.data);
+                        context.commit("lists", res?.data?.data || []);
                         resolve(res);
                     })
                     .catch((err) => {
+                        context.commit("lists", []);
                         reject(err);
                     });
             });
         },
-        show: function (context,payload) {
+        show: function (context, payload) {
             return new Promise((resolve, reject) => {
                 let url = `admin/country-code/show/${payload}`;
                 axios
                     .get(url)
                     .then((res) => {
-                        context.commit("show", res.data.data);
+                        context.commit("show", res?.data?.data || {});
                         resolve(res);
                     })
                     .catch((err) => {
@@ -48,10 +49,10 @@ export const countryCode = {
 
     mutations: {
         lists: function (state, payload) {
-            state.lists = payload;
+            state.lists = Array.isArray(payload) ? payload : [];
         },
         show: function (state, payload) {
-            state.show = payload;
+            state.show = (payload && typeof payload === 'object') ? payload : {};
         },
     },
 };

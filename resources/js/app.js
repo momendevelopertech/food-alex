@@ -63,6 +63,24 @@ const getApiKey = () => {
 const baseUrl = getBaseUrl();
 axios.defaults.baseURL = baseUrl ? (baseUrl + '/api') : '/api';
 
+// Concurrency pool to prevent hitting shared hosting entry process limits (HTTP 508)
+const MAX_CONCURRENT = 4;
+let activeRequests = 0;
+const requestQueue = [];
+
+const processQueue = () => {
+    while (activeRequests < MAX_CONCURRENT && requestQueue.length > 0) {
+        activeRequests++;
+        const { resolve } = requestQueue.shift();
+        resolve();
+    }
+};
+
+const releaseQueue = () => {
+    activeRequests = Math.max(0, activeRequests - 1);
+    processQueue();
+};
+
 axios.interceptors.request.use(
     config => {
         config.headers['x-api-key'] = getApiKey();
@@ -81,9 +99,38 @@ axios.interceptors.request.use(
                 // Ignore json parse error
             }
         }
-        return config;
+
+        return new Promise(resolve => {
+            requestQueue.push({ resolve: () => resolve(config) });
+            processQueue();
+        });
     },
-    error => Promise.reject(error),
+    error => {
+        releaseQueue();
+        return Promise.reject(error);
+    }
+);
+
+axios.interceptors.response.use(
+    response => {
+        releaseQueue();
+        return response;
+    },
+    async error => {
+        releaseQueue();
+
+        const config = error?.config;
+        const status = error?.response?.status;
+
+        // Auto retry on 508 (Loop Detected / Resource limit) or 429 once after 400ms delay
+        if (config && (status === 508 || status === 429) && !config._retry508) {
+            config._retry508 = true;
+            await new Promise(r => setTimeout(r, 400));
+            return axios(config);
+        }
+
+        return Promise.reject(error);
+    }
 );
 /* End axios code */
 

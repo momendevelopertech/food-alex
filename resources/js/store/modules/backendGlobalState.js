@@ -23,7 +23,7 @@ export const backendGlobalState = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("branches", res.data.data);
                     }
                     resolve(res);

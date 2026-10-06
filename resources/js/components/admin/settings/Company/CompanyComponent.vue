@@ -155,22 +155,23 @@ export default {
         loadInfo: async function () {
             try {
                 this.loading.isActive = true;
-               await this.$store.dispatch('countryCode/lists');
+                await this.$store.dispatch('countryCode/lists').catch(() => {});
                 this.$store
                     .dispatch("company/lists")
                     .then((res) => {
-                        this.form = {
-                            company_name: res.data.data.company_name,
-                            company_email: res.data.data.company_email,
-                            company_phone: res.data.data.company_phone,
-                            company_website: res.data.data.company_website,
-                            company_city: res.data.data.company_city,
-                            company_state: res.data.data.company_state,
-                            company_country_code:
-                                res.data.data.company_country_code,
-                            company_zip_code: res.data.data.company_zip_code,
-                            company_address: res.data.data.company_address,
-                        };
+                        if (res?.data?.data) {
+                            this.form = {
+                                company_name: res.data.data.company_name || "",
+                                company_email: res.data.data.company_email || "",
+                                company_phone: res.data.data.company_phone || "",
+                                company_website: res.data.data.company_website || "",
+                                company_city: res.data.data.company_city || "",
+                                company_state: res.data.data.company_state || "",
+                                company_country_code: res.data.data.company_country_code || null,
+                                company_zip_code: res.data.data.company_zip_code || "",
+                                company_address: res.data.data.company_address || "",
+                            };
+                        }
                         this.loading.isActive = false;
                     })
                     .catch((err) => {
@@ -178,7 +179,6 @@ export default {
                     });
             } catch (err) {
                 this.loading.isActive = false;
-                alertService.error(err);
             }
         },
         save: function () {

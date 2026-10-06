@@ -15,7 +15,7 @@ export const permission = {
         lists: function (context, payload) {
             return new Promise((resolve, reject) => {
                 axios.get(`admin/setting/permission/${payload}`).then((res) => {
-                    if(typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if(typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit('lists', res.data.data);
                     }
                     resolve(res);

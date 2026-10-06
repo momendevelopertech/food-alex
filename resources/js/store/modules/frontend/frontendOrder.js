@@ -55,7 +55,7 @@ export const frontendOrder = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit('activeOrder', res.data.data);
                     }
                     resolve(res);
@@ -71,7 +71,7 @@ export const frontendOrder = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit('previousOrder', res.data.data);
                         context.commit("page", res.data.meta);
                         context.commit("pagination", res.data);

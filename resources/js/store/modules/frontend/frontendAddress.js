@@ -36,7 +36,7 @@ export const frontendAddress = {
                     url = url + appService.requestHandler(payload.search);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("lists", res.data.data);
                         if(typeof payload.search.paginate !== 'undefined' && payload.search.paginate === 1) {
                             context.commit("pagination", res.data.data);

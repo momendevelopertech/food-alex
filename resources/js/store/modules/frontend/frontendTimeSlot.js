@@ -27,7 +27,7 @@ export const frontendTimeSlot = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("today", res.data.data);
                     }
                     resolve(res);
@@ -43,7 +43,7 @@ export const frontendTimeSlot = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("tomorrow", res.data.data);
                     }
 

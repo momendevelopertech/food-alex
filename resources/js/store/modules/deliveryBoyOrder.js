@@ -60,7 +60,7 @@ export const deliveryBoyOrder = {
                     url = url + appService.requestHandler(payload.search);
                 }
                 axios.get(url).then((res) => {
-                        if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                        if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                             context.commit("deliveredOrders", res.data.data);
                             context.commit("deliveredOrderPage", res.data.meta);
                             context.commit("deliveredOrderPagination", res.data);

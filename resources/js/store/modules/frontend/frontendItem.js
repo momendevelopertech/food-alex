@@ -27,7 +27,7 @@ export const frontendItem = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if(typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if(typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit('lists', res.data.data);
                     }
                     resolve(res);
@@ -43,7 +43,7 @@ export const frontendItem = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("featured", res.data.data);
                     }
                     resolve(res);
@@ -59,7 +59,7 @@ export const frontendItem = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    if (typeof payload?.vuex === "undefined" || payload?.vuex === true) {
                         context.commit("popular", res.data.data);
                     }
                     resolve(res);
