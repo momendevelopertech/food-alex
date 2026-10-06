@@ -55,7 +55,7 @@
                                 $t("label.phone")
                             }}</label>
                             <input v-model="props.form.phone" v-bind:class="errors.phone ? 'invalid' : ''" type="text"
-                                id="phone" class="db-field-control" />
+                                id="phone" dir="ltr" class="db-field-control text-left" />
                             <small class="db-field-alert" v-if="errors.phone">{{
                                 errors.phone[0]
                             }}</small>

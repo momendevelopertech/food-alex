@@ -11,18 +11,19 @@
                     <label for="phone" class="text-sm capitalize mb-1 text-heading">
                         {{ $t('label.mobile_number') }}
                     </label>
-                    <div :class="errors.phone ? 'invalid' : ''"
-                        class="w-full h-12 rounded-lg border px-4 flex items-center border-[#D9DBE9]">
-                        <div class="w-fit flex-shrink-0 dropdown-group">
-                            <button type="button" class="flex items-center gap-1">
-                                {{ flag }}
-                                <span class="whitespace-nowrap flex-shrink-0 text-sm">{{ props.form.code }}</span>
-                                <input type="hidden" v-model="props.form.code">
-                            </button>
+                    <div :class="errors.phone ? 'invalid border-danger' : 'border-[#D9DBE9]'"
+                        dir="ltr"
+                        class="w-full h-12 rounded-lg border flex items-center bg-white overflow-hidden transition-all focus-within:border-primary">
+                        <div class="h-full flex items-center gap-1.5 px-3 bg-gray-50 flex-shrink-0 border-r border-[#D9DBE9] select-none cursor-default">
+                            <span class="text-base leading-none">{{ flag }}</span>
+                            <span dir="ltr" class="whitespace-nowrap text-sm font-semibold text-heading" style="unicode-bidi: isolate;">{{ props.form.code }}</span>
+                            <input type="hidden" v-model="props.form.code">
                         </div>
                         <input id="phone" v-model="props.form.phone" v-on:keyup.enter="save"
                             v-on:keypress="phoneNumber($event)" type="text"
-                            class="pl-4 text-sm w-full h-full text-heading">
+                            dir="ltr"
+                            placeholder="1xxxxxxxxx"
+                            class="px-3 text-sm w-full h-full text-heading border-none outline-none focus:outline-none focus:ring-0 bg-transparent text-left">
                     </div>
                     <small class="db-field-alert" v-if="errors.phone">
                         {{ errors.phone[0] }}

@@ -85,7 +85,8 @@
                             <tr class="db-table-body-tr" v-for="user in creditBalanceReports" :key="user">
                                 <td class="db-table-body-td">{{ user.name }}</td>
                                 <td class="db-table-body-td">{{ user.email }}</td>
-                                <td class="db-table-body-td">{{ user.phone ? user.country_code + '' + user.phone : '' }}
+                                <td class="db-table-body-td">
+                                    <span dir="ltr" style="unicode-bidi: isolate;">{{ user.phone ? user.country_code + ' ' + user.phone : '' }}</span>
                                 </td>
                                 <td class="db-table-body-td">{{ user.balance }}</td>
 

@@ -62,7 +62,7 @@
                         </li>
                         <li class="flex items-center gap-2.5 text-white">
                             <i class="lab lab-call-center lab-font-size-24"></i>
-                            <span class="text-lg font-medium">{{ setting.company_phone }}</span>
+                            <span dir="ltr" class="text-lg font-medium" style="unicode-bidi: isolate;">{{ setting.company_phone }}</span>
                         </li>
                     </ul>
                 </div>

@@ -364,23 +364,19 @@
                         </div>
                         <div class="col-12 sm:col-6">
                             <label for="phone" class="db-field-title">{{ $t("label.phone") }}</label>
-                            <div :class="errors.phone ? 'invalid' : ''"
-                                class="w-full h-12 rounded-lg border px-4 flex items-center border-[#D9DBE9]">
-                                <div class="w-fit flex-shrink-0 dropdown-group">
-                                    <button type="button" class="flex items-center gap-1 dropdown-btn">
-                                        {{ flag }}
-                                        <span class="whitespace-nowrap flex-shrink-0 text-xs">
-                                            {{
-                                                customerProps.form.country_code
-                                            }}
-                                        </span>
-                                        <input type="hidden" v-model="customerProps.form.country_code
-                                            " />
-                                    </button>
+                            <div :class="errors.phone ? 'invalid border-danger' : 'border-[#D9DBE9]'"
+                                dir="ltr"
+                                class="w-full h-12 rounded-lg border flex items-center bg-white overflow-hidden transition-all focus-within:border-primary">
+                                <div class="h-full flex items-center gap-1.5 px-3 bg-gray-50 flex-shrink-0 border-r border-[#D9DBE9] select-none cursor-default">
+                                    <span class="text-base leading-none">{{ flag }}</span>
+                                    <span dir="ltr" class="whitespace-nowrap text-xs font-semibold text-heading" style="unicode-bidi: isolate;">
+                                        {{ customerProps.form.country_code }}
+                                    </span>
+                                    <input type="hidden" v-model="customerProps.form.country_code" />
                                 </div>
                                 <input v-model="customerProps.form.phone" v-on:keypress="phoneNumber($event)"
-                                    v-bind:class="errors.phone ? 'invalid' : ''" type="text" id="phone"
-                                    class="pl-2 text-sm w-full h-full" />
+                                    type="text" id="phone" dir="ltr"
+                                    class="px-3 text-sm w-full h-full text-heading border-none outline-none focus:outline-none focus:ring-0 bg-transparent text-left" />
                             </div>
                             <small class="db-field-alert" v-if="errors.phone">
                                 {{ errors.phone[0] }}

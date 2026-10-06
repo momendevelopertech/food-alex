@@ -84,7 +84,7 @@
                             <div class="db-list-item p-0">
                                 <span class="db-list-item-title w-full sm:w-1/2">{{ $t('label.phone') }}</span>
                                 <span class="db-list-item-text w-full sm:w-1/2">
-                                    {{ deliveryBoy.phone ? deliveryBoy.country_code + '' + deliveryBoy.phone : '' }}
+                                    <span dir="ltr" style="unicode-bidi: isolate;">{{ deliveryBoy.phone ? deliveryBoy.country_code + ' ' + deliveryBoy.phone : '' }}</span>
                                 </span>
                             </div>
                         </div>

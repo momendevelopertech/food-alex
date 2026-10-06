@@ -38,18 +38,19 @@
                         </div>
                         <div class="col-12 sm:col-6">
                             <label for="phone" class="text-xs capitalize mb-1 text-heading">{{ $t('label.phone') }}</label>
-                            <div class="w-full h-12 rounded-lg border px-4 flex items-center border-[#D9DBE9]" :class="errors.phone ? 'invalid' : ''">
-                                <div class="w-fit flex-shrink-0 dropdown-group">
-                                    <button type="button" class="flex items-center gap-1 dropdown-btn">
-                                        {{ flag }}
-                                        <span class="whitespace-nowrap flex-shrink-0 text-xs">
-                                            {{ form.country_code }}
-                                        </span>
-                                        <input type="hidden" v-model="form.country_code">
-                                    </button>
+                            <div :class="errors.phone ? 'invalid border-danger' : 'border-[#D9DBE9]'"
+                                dir="ltr"
+                                class="w-full h-12 rounded-lg border flex items-center bg-white overflow-hidden transition-all focus-within:border-primary">
+                                <div class="h-full flex items-center gap-1.5 px-3 bg-gray-50 flex-shrink-0 border-r border-[#D9DBE9] select-none cursor-default">
+                                    <span class="text-base leading-none">{{ flag }}</span>
+                                    <span dir="ltr" class="whitespace-nowrap flex-shrink-0 text-xs font-semibold text-heading" style="unicode-bidi: isolate;">
+                                        {{ form.country_code }}
+                                    </span>
+                                    <input type="hidden" v-model="form.country_code">
                                 </div>
                                 <input id="phone" type="text" v-on:keypress="phoneNumber($event)" v-model="form.phone"
-                                    class="pl-4 text-sm w-full h-full text-heading">
+                                    dir="ltr"
+                                    class="px-3 text-sm w-full h-full text-heading border-none outline-none focus:outline-none focus:ring-0 bg-transparent text-left">
                             </div>
                             <small class="db-field-alert" v-if="errors.phone">
                                 {{ errors.phone[0] }}

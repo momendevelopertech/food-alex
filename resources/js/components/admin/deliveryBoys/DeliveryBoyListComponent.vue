@@ -92,8 +92,9 @@
                         <tr class="db-table-body-tr" v-for="deliveryBoy in deliveryBoys" :key="deliveryBoy">
                             <td class="db-table-body-td">{{ textShortener(deliveryBoy.name, 20) }}</td>
                             <td class="db-table-body-td">{{ deliveryBoy.email }}</td>
-                            <td class="db-table-body-td">{{ deliveryBoy.phone ? deliveryBoy.country_code + '' +
-                                deliveryBoy.phone : '' }}</td>
+                            <td class="db-table-body-td">
+                                <span dir="ltr" style="unicode-bidi: isolate;">{{ deliveryBoy.phone ? deliveryBoy.country_code + ' ' + deliveryBoy.phone : '' }}</span>
+                            </td>
                             <td class="db-table-body-td">
                                 <span :class="statusClass(deliveryBoy.status)">
                                     {{ enums.statusEnumArray[deliveryBoy.status] }}

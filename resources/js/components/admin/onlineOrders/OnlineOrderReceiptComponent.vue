@@ -157,7 +157,7 @@
                             </tr>
                             <tr v-if="orderUser.phone">
                                 <td class="pt-1 pb-1 pr-1">{{ $t('label.phone') }}:</td>
-                                <td class="pt-1 pb-1">{{ orderUser.country_code + '' + orderUser.phone }}</td>
+                                <td class="pt-1 pb-1"><span dir="ltr" style="unicode-bidi: isolate;">{{ orderUser.country_code + ' ' + orderUser.phone }}</span></td>
                             </tr>
                             <tr v-if="order.order_type === enums.orderTypeEnum.DELIVERY">
                                 <td class="pt-1 pb-1 pr-1">{{ $t('label.address') }}:</td>

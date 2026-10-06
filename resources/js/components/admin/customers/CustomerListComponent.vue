@@ -91,7 +91,7 @@
                                 {{ customer.email }}
                             </td>
                             <td class="db-table-body-td">
-                                {{ customer.phone ? customer.country_code + '' + customer.phone : '' }}
+                                <span dir="ltr" style="unicode-bidi: isolate;">{{ customer.phone ? customer.country_code + ' ' + customer.phone : '' }}</span>
                             </td>
                             <td class="db-table-body-td">
                                 <span :class="statusClass(customer.status)">

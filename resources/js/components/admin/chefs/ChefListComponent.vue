@@ -102,7 +102,7 @@
                                 {{ chef.email }}
                             </td>
                             <td class="db-table-body-td">
-                                {{ chef.phone ? chef.country_code + '' + chef.phone : '' }}
+                                <span dir="ltr" style="unicode-bidi: isolate;">{{ chef.phone ? chef.country_code + ' ' + chef.phone : '' }}</span>
                             </td>
                             <td class="db-table-body-td">
                                 <span :class="statusClass(chef.status)">

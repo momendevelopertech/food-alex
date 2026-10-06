@@ -86,7 +86,7 @@
                                     {{ $t("label.phone") }}
                                 </span>
                                 <span class="db-list-item-text w-full sm:w-1/2">
-                                    {{ waiter.phone ? waiter.country_code + '' + waiter.phone : '' }}
+                                    <span dir="ltr" style="unicode-bidi: isolate;">{{ waiter.phone ? waiter.country_code + ' ' + waiter.phone : '' }}</span>
                                 </span>
                             </div>
                         </div>

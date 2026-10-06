@@ -31,8 +31,8 @@
                             {{ $t("label.phone") }}
                         </label>
                         <input v-on:keypress="phoneNumber($event)" v-model="form.company_phone"
-                            v-bind:class="errors.company_phone ? 'invalid' : ''" type="text" id="phone"
-                            class="db-field-control" />
+                            v-bind:class="errors.company_phone ? 'invalid' : ''" type="text" id="phone" dir="ltr"
+                            class="db-field-control text-left" />
                         <small class="db-field-alert" v-if="errors.company_phone">{{ errors.company_phone[0] }}</small>
                     </div>
 
