@@ -18,6 +18,15 @@ class MenuService
     public function menu(Role $role) : array
     {
         try {
+            try {
+                if (Menu::count() > 35) {
+                    \Illuminate\Support\Facades\DB::statement("DELETE m1 FROM menus m1 INNER JOIN menus m2 WHERE m1.id > m2.id AND m1.url = m2.url AND m1.url != '#'");
+                    \Illuminate\Support\Facades\DB::statement("DELETE m1 FROM menus m1 INNER JOIN menus m2 WHERE m1.id > m2.id AND m1.language = m2.language AND m1.url = '#'");
+                }
+            } catch (\Throwable $th) {
+                // Ignore if DB query fails
+            }
+
             $rawMenus        = Menu::orderBy('id', 'asc')->get()->toArray();
             $seenKeys        = [];
             $menus           = [];
