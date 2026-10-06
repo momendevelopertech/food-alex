@@ -10,7 +10,6 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Enums\Status;
 
-
 class UserTableSeeder extends Seeder
 {
     /**
@@ -21,439 +20,163 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         $envService = new EnvEditor();
-        $admin      = User::create([
-            'name'              => 'مدحت',
-            'email'             => 'admin@example.com',
-            'phone'             => '0123456789',
-            'username'          => 'admin',
-            'email_verified_at' => now(),
-            'password'          => bcrypt('123456'),
-            'branch_id'         => 0,
-            'status'            => Status::ACTIVE,
-            'country_code'      => '+20',
-            'is_guest'          => Ask::NO
-        ]);
-        $admin->assignRole(EnumRole::ADMIN);
+        $isDemo     = (bool)($envService->getValue('DEMO') ?: env('DEMO'));
 
-        if ($envService->getValue('DEMO')) {
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 10',
-                'latitude'  => '23.8069',
-                'longitude' => '90.3687',
-                'user_id'   => $admin->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $admin->id,
-            ]);
-        }
-
-        $customer = User::create([
-            'name'              => 'Walking Customer',
-            'email'             => 'walkingcustomer@example.com',
-            'phone'             => '125444455',
-            'username'          => 'default-customer',
-            'email_verified_at' => now(),
-            'password'          => bcrypt('123456'),
-            'branch_id'         => 0,
-            'status'            => Status::ACTIVE,
-            'country_code'      => '+880',
-            'is_guest'          => Ask::NO
-        ]);
-        $customer->assignRole(EnumRole::CUSTOMER);
-
-        if ($envService->getValue('DEMO')) {
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $customer->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 2',
-                'latitude'  => '23.7948',
-                'longitude' => '90.4143',
-                'user_id'   => $customer->id,
-            ]);
-        }
-
-        if ($envService->getValue('DEMO')) {
-            $customerOne = User::create([
-                'name'              => 'Will Smith',
-                'email'             => 'customer@example.com',
-                'phone'             => '1253333444',
-                'username'          => 'will-smith',
+        // 1. Admin
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name'              => 'مدحت (المدير)',
+                'phone'             => '0123456789',
+                'username'          => 'admin',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('123456'),
                 'branch_id'         => 0,
                 'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
+                'country_code'      => '+20',
                 'is_guest'          => Ask::NO
-            ]);
-            $customerOne->assignRole(EnumRole::CUSTOMER);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 2',
-                'latitude'  => '23.7948',
-                'longitude' => '90.4143',
-                'user_id'   => $customerOne->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $customerOne->id,
-            ]);
-            Address::create([
-                'label'     => 'Another Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 1',
-                'latitude'  => '23.7807',
-                'longitude' => '90.4158',
-                'user_id'   => $customerOne->id,
-            ]);
+            ]
+        );
+        $admin->syncRoles([EnumRole::ADMIN]);
 
-            $DeliveryBoyOne = User::create([
-                'name'              => 'Kawsar Uddin',
-                'email'             => 'deliveryboy@example.com',
-                'phone'             => '1244444333',
-                'username'          => 'kawsar-uddin131',
+        // 2. Default Walking Customer
+        $customer = User::firstOrCreate(
+            ['email' => 'walkingcustomer@example.com'],
+            [
+                'name'              => 'Walking Customer',
+                'phone'             => '01000000000',
+                'username'          => 'default-customer',
+                'email_verified_at' => now(),
+                'password'          => bcrypt('123456'),
+                'branch_id'         => 0,
+                'status'            => Status::ACTIVE,
+                'country_code'      => '+20',
+                'is_guest'          => Ask::NO
+            ]
+        );
+        $customer->syncRoles([EnumRole::CUSTOMER]);
+
+        // 3. Demo Customer (العميل)
+        $customerOne = User::firstOrCreate(
+            ['email' => 'customer@example.com'],
+            [
+                'name'              => 'عميل تجريبي',
+                'phone'             => '01000000001',
+                'username'          => 'customer',
+                'email_verified_at' => now(),
+                'password'          => bcrypt('123456'),
+                'branch_id'         => 0,
+                'status'            => Status::ACTIVE,
+                'country_code'      => '+20',
+                'is_guest'          => Ask::NO
+            ]
+        );
+        $customerOne->syncRoles([EnumRole::CUSTOMER]);
+
+        // 4. Demo Branch Manager (مدير الفرع)
+        $branchManager = User::firstOrCreate(
+            ['email' => 'branchmanager@example.com'],
+            [
+                'name'              => 'مدير الفرع',
+                'phone'             => '01000000002',
+                'username'          => 'branchmanager',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('123456'),
                 'branch_id'         => 1,
                 'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
+                'country_code'      => '+20',
                 'is_guest'          => Ask::NO
-            ]);
-            $DeliveryBoyOne->assignRole(EnumRole::DELIVERY_BOY);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $DeliveryBoyOne->id,
-            ]);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $DeliveryBoyOne->id,
-            ]);
+            ]
+        );
+        $branchManager->syncRoles([EnumRole::BRANCH_MANAGER]);
 
-            $DeliveryBoyTwo = User::create([
-                'name'              => 'Heron Khan',
-                'email'             => 'heron@example.com',
-                'phone'             => '1256444333',
-                'username'          => 'heron-khan131',
+        // 5. Demo POS Operator (مشغل نقطة البيع)
+        $posOperator = User::firstOrCreate(
+            ['email' => 'posoperator@example.com'],
+            [
+                'name'              => 'مشغل نقطة البيع (POS)',
+                'phone'             => '01000000003',
+                'username'          => 'posoperator',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('123456'),
                 'branch_id'         => 1,
                 'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
+                'country_code'      => '+20',
                 'is_guest'          => Ask::NO
-            ]);
-            $DeliveryBoyTwo->assignRole(EnumRole::DELIVERY_BOY);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $DeliveryBoyTwo->id,
-            ]);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $DeliveryBoyTwo->id,
-            ]);
+            ]
+        );
+        $posOperator->syncRoles([EnumRole::POS_OPERATOR]);
 
-            $DeliveryBoyThree = User::create([
-                'name'              => 'Nur Mahmud',
-                'email'             => 'nurmahmud@example.com',
-                'phone'             => '1255555533',
-                'username'          => 'nur-mahmud123',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('123456'),
-                'branch_id'         => 2,
-                'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
-                'is_guest'          => Ask::NO
-            ]);
-            $DeliveryBoyThree->assignRole(EnumRole::DELIVERY_BOY);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 2',
-                'latitude'  => '23.7948',
-                'longitude' => '90.4143',
-                'user_id'   => $DeliveryBoyThree->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 1',
-                'latitude'  => '23.7821',
-                'longitude' => '90.4161',
-                'user_id'   => $DeliveryBoyThree->id,
-            ]);
-
-            $employeeOne = User::create([
-                'name'              => 'Kiron Khan',
-                'email'             => 'branchmanager@example.com',
-                'phone'             => '1275333453',
-                'username'          => 'kiron-khan1313',
+        // 6. Demo Chef (الشيف / المطبخ)
+        $chef = User::firstOrCreate(
+            ['email' => 'chef@example.com'],
+            [
+                'name'              => 'شيف المطبخ',
+                'phone'             => '01000000004',
+                'username'          => 'chef',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('123456'),
                 'branch_id'         => 1,
                 'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
+                'country_code'      => '+20',
                 'is_guest'          => Ask::NO
-            ]);
-            $employeeOne->assignRole(EnumRole::BRANCH_MANAGER);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $employeeOne->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $employeeOne->id,
-            ]);
+            ]
+        );
+        $chef->syncRoles([EnumRole::CHEF]);
 
-            $employeeTwo = User::create([
-                'name'              => 'Shohag Ali',
-                'email'             => 'shohag@example.com',
-                'phone'             => '1257654433',
-                'username'          => 'shohag-ali3324',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('123456'),
-                'branch_id'         => 2,
-                'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
-                'is_guest'          => Ask::NO
-            ]);
-            $employeeTwo->assignRole(EnumRole::BRANCH_MANAGER);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 2',
-                'latitude'  => '23.7948',
-                'longitude' => '90.4143',
-                'user_id'   => $employeeTwo->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 1',
-                'latitude'  => '23.7821',
-                'longitude' => '90.4161',
-                'user_id'   => $employeeTwo->id,
-            ]);
-
-            $posOperatorOne = User::create([
-                'name'              => 'Farha Israt ',
-                'email'             => 'posoperator@example.com',
-                'phone'             => '1568736411',
-                'username'          => 'farha-istat343',
+        // 7. Delivery Boy
+        $deliveryBoy = User::firstOrCreate(
+            ['email' => 'deliveryboy@example.com'],
+            [
+                'name'              => 'طيار التوصيل',
+                'phone'             => '01000000005',
+                'username'          => 'deliveryboy',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('123456'),
                 'branch_id'         => 1,
                 'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
+                'country_code'      => '+20',
                 'is_guest'          => Ask::NO
-            ]);
-            $posOperatorOne->assignRole(EnumRole::POS_OPERATOR);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $posOperatorOne->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $posOperatorOne->id,
-            ]);
+            ]
+        );
+        $deliveryBoy->syncRoles([EnumRole::DELIVERY_BOY]);
 
-            $posOperatorTwo = User::create([
-                'name'              => 'Sahataz Afnan',
-                'email'             => 'sahataz@example.com',
-                'phone'             => '1249955570',
-                'username'          => 'sahataz-afnan232',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('123456'),
-                'branch_id'         => 2,
-                'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
-                'is_guest'          => Ask::NO
-            ]);
-            $posOperatorTwo->assignRole(EnumRole::POS_OPERATOR);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 2',
-                'latitude'  => '23.7948',
-                'longitude' => '90.4143',
-                'user_id'   => $posOperatorTwo->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 1',
-                'latitude'  => '23.7821',
-                'longitude' => '90.4161',
-                'user_id'   => $posOperatorTwo->id,
-            ]);
-
-            $stuffOne = User::create([
-                'name'              => 'Rohim Miya',
-                'email'             => 'stuff@example.com',
-                'phone'             => '1222224443',
-                'username'          => 'rohim-miya768',
+        // 8. Waiter
+        $waiter = User::firstOrCreate(
+            ['email' => 'waiter@example.com'],
+            [
+                'name'              => 'ويتر الصالة',
+                'phone'             => '01000000006',
+                'username'          => 'waiter',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('123456'),
                 'branch_id'         => 1,
                 'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
+                'country_code'      => '+20',
                 'is_guest'          => Ask::NO
-            ]);
-            $stuffOne->assignRole(EnumRole::STUFF);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $stuffOne->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $stuffOne->id,
+            ]
+        );
+        $waiter->syncRoles([EnumRole::WAITER]);
+
+        if ($isDemo) {
+            Address::firstOrCreate([
+                'user_id' => $customerOne->id,
+                'label'   => 'المنزل',
+            ], [
+                'address'   => 'الإسكندرية - سموحة',
+                'apartment' => 'شقة 12، عمارة 5',
+                'latitude'  => '31.2001',
+                'longitude' => '29.9187',
             ]);
 
-            $stuffTwo = User::create([
-                'name'              => 'Kala Chan',
-                'email'             => 'kala@example.com',
-                'phone'             => '1238426043',
-                'username'          => 'kala-chan890',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('123456'),
-                'branch_id'         => 2,
-                'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
-                'is_guest'          => Ask::NO
-            ]);
-            $stuffTwo->assignRole(EnumRole::STUFF);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 2',
-                'latitude'  => '23.7948',
-                'longitude' => '90.4143',
-                'user_id'   => $stuffTwo->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Gulshan 1',
-                'latitude'  => '23.7821',
-                'longitude' => '90.4161',
-                'user_id'   => $stuffTwo->id,
-            ]);
-
-            $waiter = User::create([
-                'name'              => 'Sakib Duronto',
-                'email'             => 'waiter@example.com',
-                'phone'             => '1275333452',
-                'username'          => 'sakib-duronto',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('123456'),
-                'branch_id'         => 1,
-                'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
-                'is_guest'          => Ask::NO
-            ]);
-            $waiter->assignRole(EnumRole::WAITER);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $waiter->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $waiter->id,
-            ]);
-
-            $chef = User::create([
-                'name'              => 'Maruf Khan',
-                'email'             => 'chef@example.com',
-                'phone'             => '1275323453',
-                'username'          => 'maruf-khan',
-                'email_verified_at' => now(),
-                'password'          => bcrypt('123456'),
-                'branch_id'         => 1,
-                'status'            => Status::ACTIVE,
-                'country_code'      => '+880',
-                'is_guest'          => Ask::NO
-            ]);
-            $chef->assignRole(EnumRole::CHEF);
-            Address::create([
-                'label'     => 'Home',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 2',
-                'latitude'  => '23.7873',
-                'longitude' => '90.3514',
-                'user_id'   => $chef->id,
-            ]);
-            Address::create([
-                'label'     => 'Work',
-                'address'   => 'Dhaka Bangladesh',
-                'apartment' => rand(0, 999) . ', Mirpur 1',
-                'latitude'  => '23.7956',
-                'longitude' => '90.3537',
-                'user_id'   => $chef->id,
+            Address::firstOrCreate([
+                'user_id' => $customerOne->id,
+                'label'   => 'العمل',
+            ], [
+                'address'   => 'الإسكندرية - محطة الرمل',
+                'apartment' => 'مكتب 402',
+                'latitude'  => '31.1985',
+                'longitude' => '29.9015',
             ]);
         }
     }
