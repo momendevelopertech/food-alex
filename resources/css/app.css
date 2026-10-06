@@ -104,8 +104,8 @@
     .db-header-profile-dropdown-menu { @apply flex items-center justify-start gap-2.5 w-full whitespace-nowrap pl-3 pr-8 py-1.5 text-sm rounded-md capitalize transition text-gray-600 hover:bg-gray-100 }
 
     /* SIDEBAR */
-    .db-sidebar { @apply fixed top-0 ltr:left-0 rtl:right-0 z-[39] w-[260px] p-4 h-dvh ltr:-translate-x-[100%] rtl:translate-x-full ltr:lg:translate-x-0 rtl:lg:-translate-x-0 lg:top-16 lg:h-[calc(100vh_-_64px)] overflow-y-auto thin-scrolling ltr:shadow-db-sidebar-right rtl:shadow-db-sidebar-left transition bg-white }
-    .db-sidebar.active { @apply ltr:translate-x-0 rtl:-translate-x-0 ltr:lg:-translate-x-[100%] rtl:lg:translate-x-full shadow-sidebar lg:shadow-none }
+    .db-sidebar { @apply fixed top-0 ltr:left-0 rtl:right-0 z-[39] w-[260px] p-4 h-dvh ltr:-translate-x-[100%] rtl:translate-x-full ltr:lg:translate-x-0 rtl:lg:translate-x-0 lg:top-16 lg:h-[calc(100vh_-_64px)] overflow-y-auto thin-scrolling ltr:shadow-db-sidebar-right rtl:shadow-db-sidebar-left transition bg-white }
+    .db-sidebar.active { @apply ltr:translate-x-0 rtl:translate-x-0 ltr:lg:-translate-x-[100%] rtl:lg:translate-x-full shadow-sidebar lg:shadow-none }
     .db-sidebar-header { @apply flex lg:hidden items-center justify-between mb-8 }
     .db-sidebar-nav { @apply mb-6 last:mb-0 }
     .db-sidebar-nav-title { @apply uppercase text-xs mb-3 font-medium tracking-[2px] text-gray-400 }
@@ -118,8 +118,8 @@
     .db-sidebar-nav-dropdown { @apply h-0 overflow-hidden transition }
     .db-sidebar-nav-menu.downarrow { @apply after:content-['\f054'] after:font-awesome after:font-bold after:text-[10px] after:transition }
     .db-sidebar-nav-item.active .downarrow { @apply after:rotate-90 }
-    .db-sidebar-nav-dropdown-list { @apply mx-5 my-2 flex flex-col border-l-2 border-gray-100 }
-    .db-sidebar-nav-dropdown-menu { @apply pl-5 pr-2 py-2 rounded-lg text-sm leading-4 capitalize transition hover:bg-gray-100 hover:text-primary }
+    .db-sidebar-nav-dropdown-list { @apply mx-5 my-2 flex flex-col ltr:border-l-2 rtl:border-r-2 border-gray-100 }
+    .db-sidebar-nav-dropdown-menu { @apply ltr:pl-5 ltr:pr-2 rtl:pr-5 rtl:pl-2 py-2 rounded-lg text-sm leading-4 capitalize transition hover:bg-gray-100 hover:text-primary }
 
     .db-message-list .active { @apply !bg-primary/5 }
     .db-message-list .active h4 { @apply text-primary }
@@ -134,10 +134,10 @@
     .ff-header .container { @apply h-[118px] lg:h-[74px] py-3 lg:py-0 }
     .ff-header.active { @apply fixed top-0 left-0 w-full z-60 }
     #cart.active { @apply opacity-100 visible }
-    #cart.active > div { @apply ltr:translate-x-0 rtl:-translate-x-0 }
+    #cart.active > div { @apply translate-x-0 }
     .fd-backdrop.active { @apply opacity-100 visible }
     #ai-sidebar.active { @apply opacity-100 visible }
-    #ai-sidebar.active > div { @apply ltr:translate-x-0 rtl:-translate-x-0 }
+    #ai-sidebar.active > div { @apply translate-x-0 }
     .cart-switch:checked + label { @apply text-white bg-[#008BBA] }
     .size-tabs .active { @apply bg-primary-light border-primary }
     .size-tabs .active .custom-radio-field:checked + .custom-radio-span { @apply border-primary }
@@ -557,3 +557,41 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .cs-custom-switcher { @apply inline-flex flex-shrink-0 items-center gap-1 justify-center cursor-pointer }
 .cs-custom-switcher input { @apply relative flex-shrink-0 w-11 h-6 cursor-pointer before:content-[''] before:inline-block before:absolute before:inset-0 before:w-full before:h-full before:rounded-3xl before:bg-paragraph before:transition-all before:duration-300 after:content-[''] after:absolute after:top-1/2 ltr:after:left-[26%] rtl:after:right-[26%] after:-translate-y-1/2 ltr:after:-translate-x-1/2 rtl:after:translate-x-1/2 after:w-5 after:h-5 after:rounded-full after:bg-gradient-to-b after:from-white after:to-white/70 after:transition-all after:duration-300 }
 .cs-custom-switcher input:checked { @apply before:bg-primary ltr:after:left-[72%] rtl:after:right-[72%] }
+
+/* Explicit RTL Layout Support for Admin Dashboard */
+[dir="rtl"] .db-sidebar {
+    right: 0 !important;
+    left: auto !important;
+}
+@media (min-width: 1024px) {
+    [dir="rtl"] .db-sidebar {
+        right: 0 !important;
+        left: auto !important;
+        transform: translateX(0) !important;
+    }
+    [dir="rtl"] .db-sidebar.active {
+        transform: translateX(100%) !important;
+    }
+    [dir="rtl"] .db-main {
+        padding-right: 280px !important;
+        padding-left: 1.25rem !important;
+    }
+    [dir="rtl"] .db-main.expand {
+        padding-right: 1.25rem !important;
+        padding-left: 1.25rem !important;
+    }
+}
+@media (max-width: 1023px) {
+    [dir="rtl"] .db-sidebar {
+        right: 0 !important;
+        left: auto !important;
+        transform: translateX(100%) !important;
+    }
+    [dir="rtl"] .db-sidebar.active {
+        transform: translateX(0) !important;
+    }
+    [dir="rtl"] .db-main {
+        padding-right: 1rem !important;
+        padding-left: 1rem !important;
+    }
+}

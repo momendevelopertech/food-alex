@@ -16,6 +16,7 @@ class SettingMenuTableSeeder extends Seeder
      */
     public function run(): void
     {
+        SettingMenu::truncate();
         $menus = [
             [
                 'name'       => 'Company',

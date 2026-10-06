@@ -8,6 +8,12 @@
       <FrontendMobileAccountComponent />
       <FrontendCookiesComponent />
       <FrontendFooterComponent />
+      <!-- Floating WhatsApp Button (Only on frontend website) -->
+      <a v-if="whatsappNumber" :href="'https://wa.me/' + whatsappNumber" target="_blank" rel="noopener noreferrer"
+         aria-label="WhatsApp"
+         class="fixed z-50 bg-[#25D366] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform hover:scale-110 ltr:right-5 rtl:left-5 bottom-20 lg:bottom-6">
+          <i class="fa-brands fa-whatsapp text-3xl"></i>
+      </a>
     </div>
 
     <div v-if="theme === 'backend'">
@@ -69,9 +75,39 @@ export default {
       theme: "frontend",
     };
   },
+  created() {
+    if (this.$route?.meta?.isFrontend === true) {
+      this.theme = "frontend";
+    } else if (this.$route?.meta?.isTable === true) {
+      this.theme = "table";
+    } else if (this.$route?.path?.includes('/admin')) {
+      this.theme = "backend";
+    }
+  },
   computed: {
     direction: function () {
-      return this.$store.getters['frontendLanguage/show'].display_mode === displayModeEnum.RTL ? 'rtl' : 'ltr';
+      const show = this.$store.getters['frontendLanguage/show'];
+      if (show && typeof show.display_mode !== 'undefined') {
+        return show.display_mode === displayModeEnum.RTL ? 'rtl' : 'ltr';
+      }
+      if (typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/(?:^|;\s*)locale=([^;]+)/);
+        const cookieLocale = cookieMatch ? cookieMatch[1] : null;
+        if (cookieLocale === 'ar' || document.documentElement.dir === 'rtl') {
+          return 'rtl';
+        }
+      }
+      return (this.$i18n && this.$i18n.locale === 'ar') ? 'rtl' : 'ltr';
+    },
+    whatsappNumber: function () {
+      if (typeof window !== 'undefined' && typeof WHATSAPP_NUMBER !== 'undefined' && WHATSAPP_NUMBER) {
+        let num = String(WHATSAPP_NUMBER).replace(/[^0-9]/g, '');
+        if (num.startsWith('0')) {
+          num = '20' + num.substring(1);
+        }
+        return num;
+      }
+      return '201012345678';
     },
     logged: function () {
       return this.$store.getters.authStatus;
@@ -81,10 +117,19 @@ export default {
     this.$store
       .dispatch("frontendSetting/lists")
       .then((res) => {
+        const defaultLang = res.data.data.site_default_language;
         this.$store.dispatch("globalState/init", {
           branch_id: res.data.data.site_default_branch,
-          language_id: res.data.data.site_default_language,
+          language_id: defaultLang,
         });
+        const activeLangId = this.$store.getters['globalState/lists']?.language_id || defaultLang;
+        if (activeLangId) {
+          this.$store.dispatch('frontendLanguage/show', activeLangId).then(lRes => {
+            if (lRes?.data?.data?.code) {
+              this.$i18n.locale = lRes.data.data.code;
+            }
+          }).catch();
+        }
       })
       .catch();
 
@@ -99,6 +144,14 @@ export default {
 
   },
   watch: {
+    direction: {
+      immediate: true,
+      handler(val) {
+        if (typeof document !== 'undefined') {
+          document.documentElement.dir = val;
+        }
+      }
+    },
     $route(e) {
       if (e.meta.isFrontend === true) {
         this.theme = "frontend";

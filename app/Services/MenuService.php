@@ -18,7 +18,16 @@ class MenuService
     public function menu(Role $role) : array
     {
         try {
-            $menus           = Menu::get()->toArray();
+            $rawMenus        = Menu::orderBy('id', 'asc')->get()->toArray();
+            $seenKeys        = [];
+            $menus           = [];
+            foreach ($rawMenus as $m) {
+                $dedupKey = ($m['url'] !== '#' && !empty($m['url'])) ? $m['url'] : ('parent_' . $m['language']);
+                if (!isset($seenKeys[$dedupKey])) {
+                    $seenKeys[$dedupKey] = true;
+                    $menus[] = $m;
+                }
+            }
             $permissions     = Permission::get();
             $rolePermissions = Permission::join(
                 "role_has_permissions",

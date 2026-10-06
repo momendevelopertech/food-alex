@@ -16,7 +16,7 @@ class SettingMenuService
     public function list()
     {
         try {
-            return SettingMenu::where('status', Status::ACTIVE)->orderBy('priority', 'desc')->get();
+            return SettingMenu::where('status', Status::ACTIVE)->orderBy('priority', 'desc')->get()->unique('url')->values();
         } catch (Exception $exception) {
             Log::info($exception->getMessage());
             throw new Exception(QueryExceptionLibrary::message($exception), 422);

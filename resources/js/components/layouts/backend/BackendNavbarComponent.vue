@@ -82,7 +82,7 @@
             <div class="dropdown-group">
                 <button class="dropdown-btn flex items-center gap-2">
                     <img class="flex-shrink-0 w-9 h-9 object-cover rounded-lg" :src="authInfo.image" alt="avatar">
-                    <h3 class="whitespace-nowrap text-sm capitalize text-left leading-[17px]">{{ $t('label.hello') }} <b
+                    <h3 class="whitespace-nowrap text-sm capitalize ltr:text-left rtl:text-right leading-[17px]">{{ $t('label.hello') }} <b
                             class="block font-semibold">{{ textShortener(authInfo.name, 15) }}</b></h3>
                     <i class="lab lab-arrow-down text-xs ml-1.5 lab-font-size-14"></i>
                 </button>
@@ -240,6 +240,17 @@ export default {
             this.$store.dispatch('backendGlobalState/branchShow', res.data.data.branch_id).then().catch();
         }).catch();
         this.$store.dispatch('backendGlobalState/branches', this.branchProps).then().catch();
+        this.$store.dispatch('frontendLanguage/lists').then().catch();
+        this.$store.dispatch('frontendSetting/lists').then(res => {
+            const langId = this.$store.getters['globalState/lists']?.language_id || res.data.data.site_default_language;
+            if (langId) {
+                this.$store.dispatch('frontendLanguage/show', langId).then(lRes => {
+                    this.$i18n.locale = lRes.data.data.code;
+                    document.cookie = `locale=${lRes.data.data.code}; path=/; max-age=31536000`;
+                    document.documentElement.dir = lRes.data.data.display_mode === displayModeEnum.RTL ? 'rtl' : 'ltr';
+                }).catch();
+            }
+        }).catch();
 
         this.orderPermissionCheck();
         this.posPermissionCheck();
@@ -330,6 +341,9 @@ export default {
             this.$store.dispatch("globalState/set", { language_id: id, language_code: code }).then(res => {
                 this.$store.dispatch('frontendLanguage/show', id).then(res => {
                     this.$i18n.locale = res.data.data.code;
+                    document.cookie = `locale=${res.data.data.code}; path=/; max-age=31536000`;
+                    document.documentElement.dir = res.data.data.display_mode === displayModeEnum.RTL ? 'rtl' : 'ltr';
+                    location.reload();
                 }).catch();
             }).catch();
         },

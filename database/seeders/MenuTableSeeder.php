@@ -16,6 +16,7 @@ class MenuTableSeeder extends Seeder
      */
     public function run()
     {
+        Menu::truncate();
         $menus = [
             [
                 'name'       => 'Dashboard',

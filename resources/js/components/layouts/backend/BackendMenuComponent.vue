@@ -50,7 +50,27 @@ export default {
             return this.$store.getters['frontendSetting/lists'];
         },
         menus: function () {
-            return this.$store.getters.authMenu;
+            const list = this.$store.getters.authMenu || [];
+            const result = [];
+            const seen = new Set();
+            for (const item of list) {
+                const key = (item.url && item.url !== '#') ? item.url : (item.name || item.language);
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    const cloned = { ...item };
+                    if (cloned.children && Array.isArray(cloned.children)) {
+                        const childSeen = new Set();
+                        cloned.children = cloned.children.filter(c => {
+                            const cKey = (c.url && c.url !== '#') ? c.url : (c.name || c.language);
+                            if (childSeen.has(cKey)) return false;
+                            childSeen.add(cKey);
+                            return true;
+                        });
+                    }
+                    result.push(cloned);
+                }
+            }
+            return result;
         },
         sidebar() {
             return this.$store.getters['globalState/lists'].topSidebar;
