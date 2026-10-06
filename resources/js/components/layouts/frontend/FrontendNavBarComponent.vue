@@ -417,6 +417,8 @@ export default {
             this.$store.dispatch("globalState/set", { language_id: id, language_code: code }).then(res => {
                 this.$store.dispatch('frontendLanguage/show', id).then(res => {
                     this.$i18n.locale = res.data.data.code;
+                    document.cookie = `locale=${res.data.data.code}; path=/; max-age=31536000`;
+                    document.documentElement.dir = res.data.data.code === 'ar' ? 'rtl' : 'ltr';
                     window.location.reload();
                 }).catch();
             }).catch();

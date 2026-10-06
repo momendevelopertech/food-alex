@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ in_array(app()->getLocale(), ['ar']) ? 'rtl' : 'ltr' }}">
 
 <head>
     <!-- REQUIRED META TAGS -->
@@ -91,6 +91,19 @@
         const GOOGLE_TOKEN = "{{ env('VITE_GOOGLE_MAP_KEY') }}";
         const APP_DEMO = "{{ env('VITE_DEMO') }}";
     </script>
+
+    <!-- Floating WhatsApp Button -->
+    @php
+        $waNumber = preg_replace('/[^0-9]/', '', env('WHATSAPP_NUMBER', '01012345678'));
+        if (str_starts_with($waNumber, '0')) {
+            $waNumber = '20' . substr($waNumber, 1);
+        }
+    @endphp
+    <a href="https://wa.me/{{ $waNumber }}" target="_blank" rel="noopener noreferrer"
+       aria-label="WhatsApp"
+       style="position:fixed;bottom:20px;inset-inline-end:20px;z-index:9999;background:#25D366;color:#fff;border-radius:9999px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3);text-decoration:none;">
+        <i class="fa-brands fa-whatsapp" style="font-size:28px;"></i>
+    </a>
 
     <script src="{{ asset('themes/default/js/drawer.js') }}"></script>
     <script src="{{ asset('themes/default/js/modal.js') }}"></script>

@@ -10,7 +10,7 @@ class localization
 {
     public function handle(Request $request, Closure $next)
     {
-        $local = ($request->hasHeader('x-localization')) ? $request->header('x-localization') : 'en';
+        $local = ($request->hasHeader('x-localization')) ? $request->header('x-localization') : ($request->cookie('locale') ?? 'ar');
         App::setLocale($local);
         return $next($request);
     }
