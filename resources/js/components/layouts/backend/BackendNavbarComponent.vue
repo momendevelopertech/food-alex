@@ -242,15 +242,17 @@ export default {
         this.$store.dispatch('backendGlobalState/branches', this.branchProps).then().catch();
         this.$store.dispatch('frontendLanguage/lists').then().catch();
         this.$store.dispatch('frontendSetting/lists').then(res => {
-            const langId = this.$store.getters['globalState/lists']?.language_id || res.data.data.site_default_language;
+            const langId = this.$store.getters['globalState/lists']?.language_id || res?.data?.data?.site_default_language;
             if (langId) {
                 this.$store.dispatch('frontendLanguage/show', langId).then(lRes => {
-                    this.$i18n.locale = lRes.data.data.code;
-                    document.cookie = `locale=${lRes.data.data.code}; path=/; max-age=31536000`;
-                    document.documentElement.dir = lRes.data.data.display_mode === displayModeEnum.RTL ? 'rtl' : 'ltr';
-                }).catch();
+                    if (lRes?.data?.data?.code) {
+                        this.$i18n.locale = lRes.data.data.code;
+                        document.cookie = `locale=${lRes.data.data.code}; path=/; max-age=31536000`;
+                        document.documentElement.dir = lRes.data.data.display_mode === displayModeEnum.RTL ? 'rtl' : 'ltr';
+                    }
+                }).catch(() => {});
             }
-        }).catch();
+        }).catch(() => {});
 
         this.orderPermissionCheck();
         this.posPermissionCheck();

@@ -126,10 +126,12 @@ export default {
 
         this.loading.isActive = true;
         this.$store.dispatch('frontendSetting/lists').then(res => {
-            this.defaultLanguage = res.data.data.site_default_language;
+            if (res?.data?.data) {
+                this.defaultLanguage = res.data.data.site_default_language;
+            }
             const globalState = this.$store.getters['globalState/lists'];
 
-            if (globalState.language_id > 0) {
+            if (globalState?.language_id > 0) {
                 this.defaultLanguage = globalState.language_id;
             }
 

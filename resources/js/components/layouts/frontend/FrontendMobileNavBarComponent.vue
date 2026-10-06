@@ -66,8 +66,8 @@ export default {
         categories: {
             deep: true,
             handler(category) {
-                if (category.length > 0) {
-                    if (category[0].slug !== "undefined") {
+                if (category && Array.isArray(category) && category.length > 0) {
+                    if (category[0] && category[0].slug && category[0].slug !== "undefined") {
                         this.categoryProps.slug = category[0].slug;
                     }
                 }

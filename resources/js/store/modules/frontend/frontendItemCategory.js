@@ -9,10 +9,10 @@ export const frontendItemCategory = {
     },
     getters: {
         lists: function (state) {
-            return state.lists;
+            return Array.isArray(state.lists) ? state.lists : [];
         },
         show: function (state) {
-            return state.show;
+            return state.show || {};
         },
     },
     actions: {
@@ -23,8 +23,8 @@ export const frontendItemCategory = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    if (typeof payload.vuex === "undefined" || payload.vuex === true) {
-                        context.commit("lists", res.data.data);
+                    if (!payload || typeof payload.vuex === "undefined" || payload.vuex === true) {
+                        context.commit("lists", res?.data?.data || []);
                     }
                     resolve(res);
                 }).catch((err) => {
@@ -33,11 +33,11 @@ export const frontendItemCategory = {
             });
         },
         show: function (context, payload) {
-            if(payload) {
+            if (payload) {
                 return new Promise((resolve, reject) => {
                     axios.get(`frontend/item-category/show/${payload.slug}`).then((res) => {
-                        if (typeof payload.vuex === "undefined" || payload.vuex === true) {
-                            context.commit("show", res.data.data);
+                        if (!payload || typeof payload.vuex === "undefined" || payload.vuex === true) {
+                            context.commit("show", res?.data?.data || {});
                         }
                         resolve(res);
                     }).catch((err) => {
@@ -49,10 +49,10 @@ export const frontendItemCategory = {
     },
     mutations: {
         lists: function (state, payload) {
-            state.lists = payload;
+            state.lists = Array.isArray(payload) ? payload : [];
         },
         show: function (state, payload) {
-            state.show = payload;
+            state.show = payload || {};
         }
     },
 };

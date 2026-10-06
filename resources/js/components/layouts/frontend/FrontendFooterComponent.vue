@@ -34,7 +34,7 @@
                 <div>
                     <div class="sm:w-fit sm:mx-auto">
                         <h3 class="capitalize text-lg font-semibold mb-6 text-white">{{ $t('label.useful_links') }}</h3>
-                        <nav v-if="pages.length > 0" class="flex flex-col items-start gap-3">
+                        <nav v-if="pages && pages.length > 0" class="flex flex-col items-start gap-3">
                             <router-link v-for="page in pages" class="capitalize text-white hover:underline"
                                 :to="{ name: 'frontend.page', params: { slug: page.slug } }">
                                 {{ page.title }}
@@ -102,7 +102,7 @@ export default {
             return this.$store.getters['frontendSetting/lists'];
         },
         pages: function () {
-            return this.$store.getters['frontendPage/lists'];
+            return this.$store.getters['frontendPage/lists'] || [];
         }
     },
     mounted() {

@@ -40,19 +40,46 @@ const options = {
 
 
 /* Start axios code*/
-const API_URL = ENV.API_URL;
-const API_KEY = ENV.API_KEY;
+const getBaseUrl = () => {
+    if (typeof window !== 'undefined' && window.APP_URL) {
+        return window.APP_URL.replace(/\/+$/, '');
+    }
+    if (ENV.API_URL) {
+        return ENV.API_URL.replace(/\/+$/, '');
+    }
+    if (typeof window !== 'undefined' && window.location && window.location.origin) {
+        return window.location.origin;
+    }
+    return '';
+};
 
-axios.defaults.baseURL = API_URL + '/api';
+const getApiKey = () => {
+    if (typeof window !== 'undefined' && window.APP_KEY) {
+        return window.APP_KEY;
+    }
+    return ENV.API_KEY || '';
+};
+
+const baseUrl = getBaseUrl();
+axios.defaults.baseURL = baseUrl ? (baseUrl + '/api') : '/api';
+
 axios.interceptors.request.use(
     config => {
-        config.headers['x-api-key'] = API_KEY;
-        if (localStorage.getItem('vuex')) {
-            const vuex = JSON.parse(localStorage.getItem('vuex'));
-            const token = vuex.auth.authToken;
-            const language = vuex.globalState.lists.language_code;
-            config.headers['Authorization'] = token ? `Bearer ${token}` : '';
-            config.headers['x-localization'] = language;
+        config.headers['x-api-key'] = getApiKey();
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('vuex')) {
+            try {
+                const vuex = JSON.parse(localStorage.getItem('vuex'));
+                const token = vuex?.auth?.authToken;
+                const language = vuex?.globalState?.lists?.language_code;
+                if (token) {
+                    config.headers['Authorization'] = `Bearer ${token}`;
+                }
+                if (language) {
+                    config.headers['x-localization'] = language;
+                }
+            } catch (e) {
+                // Ignore json parse error
+            }
         }
         return config;
     },

@@ -4,11 +4,11 @@ import appService from "../../../services/appService";
 export const frontendSetting = {
     namespaced: true,
     state: {
-        lists: [],
+        lists: {},
     },
     getters: {
         lists: function (state) {
-            return state.lists;
+            return (state.lists && typeof state.lists === 'object') ? state.lists : {};
         }
     },
     actions: {
@@ -19,7 +19,7 @@ export const frontendSetting = {
                     url = url + appService.requestHandler(payload);
                 }
                 axios.get(url).then((res) => {
-                    context.commit("lists", res.data.data);
+                    context.commit("lists", res?.data?.data || {});
                     resolve(res);
                 }).catch((err) => {
                     reject(err);
@@ -29,7 +29,7 @@ export const frontendSetting = {
     },
     mutations: {
         lists: function (state, payload) {
-            state.lists = payload;
+            state.lists = (payload && typeof payload === 'object') ? payload : {};
         }
     },
 };

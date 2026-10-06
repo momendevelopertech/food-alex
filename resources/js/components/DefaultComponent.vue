@@ -117,21 +117,25 @@ export default {
     this.$store
       .dispatch("frontendSetting/lists")
       .then((res) => {
-        const defaultLang = res.data.data.site_default_language;
-        this.$store.dispatch("globalState/init", {
-          branch_id: res.data.data.site_default_branch,
-          language_id: defaultLang,
-        });
+        const defaultLang = res?.data?.data?.site_default_language;
+        if (res?.data?.data) {
+          this.$store.dispatch("globalState/init", {
+            branch_id: res.data.data.site_default_branch,
+            language_id: defaultLang,
+          });
+        }
         const activeLangId = this.$store.getters['globalState/lists']?.language_id || defaultLang;
         if (activeLangId) {
           this.$store.dispatch('frontendLanguage/show', activeLangId).then(lRes => {
             if (lRes?.data?.data?.code) {
               this.$i18n.locale = lRes.data.data.code;
             }
-          }).catch();
+          }).catch(() => {});
         }
       })
-      .catch();
+      .catch((err) => {
+        console.error("frontendSetting/lists error:", err);
+      });
 
 
     if (env.DEMO === "true" || env.DEMO === 'TRUE' || env.DEMO === true || env.DEMO === "1" || env.DEMO === 1) {

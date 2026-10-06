@@ -318,9 +318,11 @@ export default {
         this.loading.isActive = true;
         this.orderPermissionCheck();
         this.$store.dispatch('frontendSetting/lists').then(res => {
-            this.defaultBranch = res.data.data.site_default_branch;
-            this.defaultLanguage = res.data.data.site_default_language;
-            this.defaultCountryCode = res.data.data.company_country_code;
+            if (res?.data?.data) {
+                this.defaultBranch = res.data.data.site_default_branch;
+                this.defaultLanguage = res.data.data.site_default_language;
+                this.defaultCountryCode = res.data.data.company_country_code;
+            }
 
             const globalState = this.$store.getters['globalState/lists'];
             if (globalState.branch_id > 0) {
@@ -498,8 +500,8 @@ export default {
         categories: {
             deep: true,
             handler(category) {
-                if (category.length > 0) {
-                    if (category[0].slug !== "undefined") {
+                if (category && Array.isArray(category) && category.length > 0) {
+                    if (category[0] && category[0].slug && category[0].slug !== "undefined") {
                         this.categoryProps.slug = category[0].slug;
                     }
                 }

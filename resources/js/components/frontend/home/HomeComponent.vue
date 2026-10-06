@@ -11,7 +11,7 @@
     <!--========BANNER PART END=============-->
 
     <!--========Category PART START=========-->
-    <section v-if="categories.length > 0" class="mb-12">
+    <section v-if="categories && categories.length > 0" class="mb-12">
         <div class="container">
             <div class="flex items-center justify-between gap-2 mb-6 mt-4">
                 <h2 class="text-2xl font-semibold capitalize">{{ $t("label.our_menu") }}</h2>
@@ -76,7 +76,7 @@ export default {
     },
     computed: {
         categories: function () {
-            return this.$store.getters["frontendItemCategory/lists"];
+            return this.$store.getters["frontendItemCategory/lists"] || [];
         },
     },
     mounted() {
@@ -96,8 +96,8 @@ export default {
         categories: {
             deep: true,
             handler(category) {
-                if (category.length > 0) {
-                    if (category[0].slug !== "undefined") {
+                if (category && Array.isArray(category) && category.length > 0) {
+                    if (category[0] && category[0].slug && category[0].slug !== "undefined") {
                         this.categoryProps.slug = category[0].slug;
                     }
                 }
