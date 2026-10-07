@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use Dipokhalder\EnvEditor\EnvEditor;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Enums\TaxType;
 use App\Enums\Status;
@@ -18,56 +16,54 @@ class TaxTableSeeder extends Seeder
      */
     public function run()
     {
-        $envService = new EnvEditor();
-        if ($envService->getValue('DEMO')) {
-            Tax::insert([
-                [
-                    'name'       => 'No-VAT',
-                    'code'       => 'VAT-0',
-                    'tax_rate'   => 0,
-                    'type'       => TaxType::PERCENTAGE,
-                    'status'     => Status::ACTIVE,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-                [
-                    'name'       => 'VAT',
-                    'code'       => 'VAT-5%',
-                    'tax_rate'   => 5,
-                    'type'       => TaxType::PERCENTAGE,
-                    'status'     => Status::ACTIVE,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-                [
-                    'name'       => 'VAT',
-                    'code'       => 'VAT-10%',
-                    'tax_rate'   => 10,
-                    'type'       => TaxType::PERCENTAGE,
-                    'status'     => Status::ACTIVE,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
-                [
-                    'name'       => 'GST',
-                    'code'       => 'GST-5%',
-                    'tax_rate'   => 5,
-                    'type'       => TaxType::PERCENTAGE,
-                    'status'     => Status::ACTIVE,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ],
+        $taxes = [
+            [
+                'id'       => 1,
+                'name'     => 'بدون ضريبة (معفى)',
+                'code'     => 'VAT-0',
+                'tax_rate' => 0,
+                'type'     => TaxType::PERCENTAGE,
+                'status'   => Status::ACTIVE,
+            ],
+            [
+                'id'       => 2,
+                'name'     => 'ضريبة القيمة المضافة (VAT 14%)',
+                'code'     => 'VAT-14%',
+                'tax_rate' => 14,
+                'type'     => TaxType::PERCENTAGE,
+                'status'   => Status::ACTIVE,
+            ],
+            [
+                'id'       => 3,
+                'name'     => 'ضريبة مخفضة (VAT 5%)',
+                'code'     => 'VAT-5%',
+                'tax_rate' => 5,
+                'type'     => TaxType::PERCENTAGE,
+                'status'   => Status::ACTIVE,
+            ],
+            [
+                'id'       => 4,
+                'name'     => 'ضريبة مبيعات (VAT 10%)',
+                'code'     => 'VAT-10%',
+                'tax_rate' => 10,
+                'type'     => TaxType::PERCENTAGE,
+                'status'   => Status::ACTIVE,
+            ],
+            [
+                'id'       => 5,
+                'name'     => 'خدمة صالة (Service 12%)',
+                'code'     => 'SVC-12%',
+                'tax_rate' => 12,
+                'type'     => TaxType::PERCENTAGE,
+                'status'   => Status::ACTIVE,
+            ],
+        ];
 
-                [
-                    'name'       => 'GST',
-                    'code'       => 'GST-10%',
-                    'tax_rate'   => 10,
-                    'type'       => TaxType::PERCENTAGE,
-                    'status'     => Status::ACTIVE,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]
-            ]);
+        foreach ($taxes as $tax) {
+            Tax::updateOrCreate(
+                ['id' => $tax['id']],
+                $tax
+            );
         }
     }
 }
