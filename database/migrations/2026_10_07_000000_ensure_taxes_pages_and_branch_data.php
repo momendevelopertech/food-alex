@@ -147,8 +147,8 @@ return new class extends Migration
         // 5. Update settings defaults for branch and company
         $settingsUpdates = [
             'site' => [
-                'site_default_branch'          => '1',
-                'site_default_currency'        => '1',
+                'site_default_branch'          => 1,
+                'site_default_currency'        => 1,
                 'site_default_currency_symbol' => 'ج.م',
             ],
             'company' => [
@@ -168,7 +168,7 @@ return new class extends Migration
             foreach ($items as $k => $val) {
                 DB::table('settings')->updateOrInsert(
                     ['group' => $group, 'key' => $k],
-                    ['value' => $val]
+                    ['payload' => json_encode($val)]
                 );
             }
         }

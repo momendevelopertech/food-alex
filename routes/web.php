@@ -215,7 +215,7 @@ Route::get('/system/sync-live-data', function (\Illuminate\Http\Request $request
         foreach ($items as $k => $val) {
             DB::table('settings')->updateOrInsert(
                 ['group' => $group, 'key' => $k],
-                ['value' => $val]
+                ['payload' => json_encode($val)]
             );
         }
     }
