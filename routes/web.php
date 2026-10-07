@@ -4,6 +4,15 @@ use App\Http\Controllers\Frontend\PaymentController;
 use App\Http\Controllers\Frontend\RootController;
 use App\Http\Controllers\Installer\InstallerController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use App\Models\Tax;
+use App\Models\Page;
+use App\Models\Branch;
+use App\Models\Address;
+use App\Enums\TaxType;
+use App\Enums\Status;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,45 +54,185 @@ Route::get('/system/sync-live-data', function (\Illuminate\Http\Request $request
         return response()->json(['error' => 'Unauthorized'], 403);
     }
     
-    // 1. Update Admin User to مدحت and Egyptian phone
-    \App\Models\User::where('email', 'admin@example.com')
+    // 1. Update Admin User and Country codes
+    User::where('email', 'admin@example.com')
         ->orWhere('id', 1)
         ->update([
-            'name' => 'مدحت',
-            'phone' => '0123456789',
-            'country_code' => '+20'
+            'name'         => 'مدحت (المدير)',
+            'phone'        => '0123456789',
+            'country_code' => '+20',
+            'status'       => Status::ACTIVE
         ]);
 
-    // 2. Replace any remaining +880 country codes with +20
-    \App\Models\User::where('country_code', '+880')
+    User::where('country_code', '+880')
         ->update(['country_code' => '+20']);
 
-    // 3. Update Settings site & company
-    \Illuminate\Support\Facades\DB::table('settings')
-        ->where('key', 'site_default_currency_symbol')
-        ->update(['value' => 'ج.م']);
-        
-    \Illuminate\Support\Facades\DB::table('settings')
-        ->where('key', 'company_country_code')
-        ->update(['value' => 'EG']);
+    // 2. Sync Taxes
+    $taxes = [
+        [
+            'id'       => 1,
+            'name'     => 'بدون ضريبة (معفى)',
+            'code'     => 'VAT-0',
+            'tax_rate' => 0,
+            'type'     => TaxType::PERCENTAGE,
+            'status'   => Status::ACTIVE,
+        ],
+        [
+            'id'       => 2,
+            'name'     => 'ضريبة القيمة المضافة (VAT 14%)',
+            'code'     => 'VAT-14%',
+            'tax_rate' => 14,
+            'type'     => TaxType::PERCENTAGE,
+            'status'   => Status::ACTIVE,
+        ],
+        [
+            'id'       => 3,
+            'name'     => 'ضريبة مخفضة (VAT 5%)',
+            'code'     => 'VAT-5%',
+            'tax_rate' => 5,
+            'type'     => TaxType::PERCENTAGE,
+            'status'   => Status::ACTIVE,
+        ],
+        [
+            'id'       => 4,
+            'name'     => 'ضريبة مبيعات (VAT 10%)',
+            'code'     => 'VAT-10%',
+            'tax_rate' => 10,
+            'type'     => TaxType::PERCENTAGE,
+            'status'   => Status::ACTIVE,
+        ],
+        [
+            'id'       => 5,
+            'name'     => 'خدمة صالة (Service 12%)',
+            'code'     => 'SVC-12%',
+            'tax_rate' => 12,
+            'type'     => TaxType::PERCENTAGE,
+            'status'   => Status::ACTIVE,
+        ],
+    ];
+    foreach ($taxes as $tax) {
+        Tax::updateOrCreate(['id' => $tax['id']], $tax);
+    }
 
-    \Illuminate\Support\Facades\DB::table('settings')
-        ->where('key', 'company_phone')
-        ->update(['value' => '0123456789']);
+    // 3. Sync Legal and Info Pages
+    $pages = [
+        [
+            'title'           => 'من نحن (About Us)',
+            'slug'            => 'about-us',
+            'description'     => "أهلاً بكم في FoodAlex - وجهتكم الأولى لأشهى المأكولات والمشروبات في الإسكندرية. نحن نحرص على تقديم أطباق محضرة بأعلى معايير الجودة والمذاق الأصيل باستخدام مكونات طازجة يومياً. هدفنا هو تقديم تجربة تناول طعام فريدة وسريعة سواء في صالة المطعم أو عبر خدمة التوصيل السريع لجميع أنحاء الإسكندرية.",
+            'menu_section_id' => 2,
+            'template_id'     => 0,
+            'status'          => Status::ACTIVE,
+        ],
+        [
+            'title'           => 'سياسة الخصوصية (Privacy Policy)',
+            'slug'            => 'privacy-policy',
+            'description'     => "نحن في FoodAlex نلتزم بحماية خصوصية بياناتك ومعلوماتك الشخصية. يتم استخدام المعلومات التي نجمعها (مثل الاسم، ورقم الهاتف، وعنوان التوصيل) فقط لتقديم الخدمة وتوصيل طلباتكم وتأكيد الحجوزات. لا نقوم بمشاركة أي من بياناتك مع أي طرف ثالث دون موافقتك الصريحة.",
+            'menu_section_id' => 2,
+            'template_id'     => 0,
+            'status'          => Status::ACTIVE,
+        ],
+        [
+            'title'           => 'الشروط والأحكام (Terms & Conditions)',
+            'slug'            => 'terms-conditions',
+            'description'     => "باستخدامك لموقع وتطبيق FoodAlex، فإنك توافق على الالتزام بشروط الاستخدام المعمول بها. تشمل الشروط صحة البيانات المدخلة عند الطلب، ومواعيد التوصيل التقديرية، وسياسة إلغاء الطلبات واسترداد الأموال بما يضمن حقوق العميل والمطعم معاً.",
+            'menu_section_id' => 2,
+            'template_id'     => 0,
+            'status'          => Status::ACTIVE,
+        ],
+        [
+            'title'           => 'سياسة ملفات تعريف الارتباط (Cookies Policy)',
+            'slug'            => 'cookies-policy',
+            'description'     => "يستخدم موقع FoodAlex ملفات تعريف الارتباط (Cookies) لتحسين تجربة تصفحك وتذكر تفضيلاتك مثل اللغة وسلة المشتريات. يمكنك تعديل إعدادات المتصفح لإيقاف هذه الملفات في أي وقت.",
+            'menu_section_id' => 2,
+            'template_id'     => 0,
+            'status'          => Status::ACTIVE,
+        ],
+        [
+            'title'           => 'اتصل بنا (Contact Us)',
+            'slug'            => 'contact-us',
+            'description'     => "يسعدنا دائماً تواصلكم معنا في FoodAlex. يمكنك الاتصال بنا مباشرة على الهاتف: 0123456789 أو مراسلتنا عبر البريد الإلكتروني: info@food-alex.kesug.com. فرعنا الرئيسي: سموحة، الإسكندرية، مصر.",
+            'menu_section_id' => 2,
+            'template_id'     => 1,
+            'status'          => Status::ACTIVE,
+        ],
+    ];
+    foreach ($pages as $p) {
+        Page::updateOrCreate(['slug' => $p['slug']], $p);
+    }
 
-    // 4. Update currencies table
-    \Illuminate\Support\Facades\DB::table('currencies')
+    // 4. Localize Branch 1
+    Branch::updateOrCreate(
+        ['id' => 1],
+        [
+            'name'      => 'فرع الإسكندرية (الرئيسي)',
+            'email'     => 'alex@food-alex.kesug.com',
+            'phone'     => '0123456789',
+            'latitude'  => 31.2000924,
+            'longitude' => 29.9187382,
+            'city'      => 'الإسكندرية',
+            'state'     => 'الإسكندرية',
+            'zip_code'  => '21500',
+            'address'   => 'سموحة، أمام جرين بلازا، الإسكندرية، مصر',
+            'status'    => Status::ACTIVE,
+        ]
+    );
+
+    // 5. Ensure Demo Customer Address
+    $customer = User::where('email', 'customer@example.com')->first();
+    if ($customer) {
+        Address::updateOrCreate([
+            'user_id' => $customer->id,
+            'label'   => 'المنزل',
+        ], [
+            'address'   => 'سموحة، الإسكندرية، مصر',
+            'apartment' => 'عمارة 14، الدور الثالث، شقة 6',
+            'latitude'  => '31.2001',
+            'longitude' => '29.9187',
+        ]);
+    }
+
+    // 6. Update Settings
+    $settingsUpdates = [
+        'site' => [
+            'site_default_branch'          => '1',
+            'site_default_currency'        => '1',
+            'site_default_currency_symbol' => 'ج.م',
+        ],
+        'company' => [
+            'company_name'         => 'FoodAlex - Restaurant Food Ordering & Delivery App',
+            'company_email'        => 'info@food-alex.kesug.com',
+            'company_phone'        => '0123456789',
+            'company_website'      => 'https://food-alex.kesug.com',
+            'company_city'         => 'الإسكندرية',
+            'company_state'        => 'الإسكندرية',
+            'company_country_code' => 'EG',
+            'company_zip_code'     => '21500',
+            'company_address'      => 'سموحة، الإسكندرية، مصر',
+        ]
+    ];
+    foreach ($settingsUpdates as $group => $items) {
+        foreach ($items as $k => $val) {
+            DB::table('settings')->updateOrInsert(
+                ['group' => $group, 'key' => $k],
+                ['value' => $val]
+            );
+        }
+    }
+
+    // 7. Currencies table
+    DB::table('currencies')
         ->where('code', 'EGP')
         ->update(['symbol' => 'ج.م']);
 
-    // 5. Clear application caches
+    // 8. Clear cache
     try {
-        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        Artisan::call('optimize:clear');
     } catch (\Throwable $e) {}
 
     return response()->json([
-        'status' => true,
-        'message' => 'Admin updated to مدحت (0123456789), currency synced to ج.م, and cache cleared successfully!'
+        'status'  => true,
+        'message' => 'Taxes, Pages, Branch, Customer Address, and Settings successfully synchronized!'
     ]);
 });
 
